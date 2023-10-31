@@ -5,12 +5,12 @@ from keras.models import load_model
 from Load_Images import preprocess_image
 
 # Directorio que contiene las imágenes de validación
-valid_folder = "src\\valid\\0 (diez)"
+valid_folder = "./src/dataset wrist x-ray/0"
 
 # Cargar el modelo preentrenado
-model = load_model("src\\models\\Best_CNN modelo 6.h5")
+model = load_model("./src/models/Best_CNN.h5")
 
-image_size = (128, 128)
+image_size = (256, 256)
 
 # Función para cargar y preprocesar imágenes de la carpeta "valid"
 def load_images_for_prediction(folder, image_size):

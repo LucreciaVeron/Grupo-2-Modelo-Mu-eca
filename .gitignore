@@ -58,6 +58,7 @@ test/
 train/
 models/
 __pycache__/
+src/
 
 
 #Archivos
