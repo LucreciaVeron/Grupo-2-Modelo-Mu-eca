@@ -7,8 +7,8 @@ from keras.models import load_model
 from keras.preprocessing import image
 
 # Cargar modelo
-model = load_model("./src/models/Best_CNN.h5")
-predict_dir = "./DATASET 3ER MODELO/Test/1"
+model = load_model("src\models\Best_CNN_ MODELO 15.h5")
+predict_dir = "DATASET 3ER MODELO\\Dataset equilibrado REFINADO\\1"
 
 # Obtener la lista de archivos de la carpeta
 image_files = os.listdir(predict_dir)
@@ -21,7 +21,8 @@ for file in image_files:
 
     # Cargar la imagen y preprocesarla para realizar la predicción
     img = cv2.imread(img_path)
-    img = cv2.resize(img, (256, 256))  # Ajustar tamaño a 256X256
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)  # Convertir a escala de grises
+    img = cv2.resize(img, (128, 128))  # Ajustar tamaño a 128x128
     img = np.expand_dims(img, axis=0)
     img = img / 255.  # Normalizar la imagen
 
