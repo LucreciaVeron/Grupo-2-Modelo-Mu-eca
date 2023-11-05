@@ -1,42 +1,39 @@
 import os
+import time
 import cv2
 import numpy as np
+import tensorflow as tf
 from keras.models import load_model
-from Load_Images import preprocess_image
+from keras.preprocessing import image
 
-# Directorio que contiene las imágenes de validación
-valid_folder = "./src/dataset wrist x-ray/0"
+# Cargar modelo
+model = load_model("src\models\Best_CNN_ MODELO 15.h5")
+predict_dir = "DATASET 3ER MODELO\\Dataset equilibrado REFINADO\\1"
 
-# Cargar el modelo preentrenado
-model = load_model("./src/models/Best_CNN.h5")
+# Obtener la lista de archivos de la carpeta
+image_files = os.listdir(predict_dir)
 
-image_size = (256, 256)
+i=0
+z=0
+# Realizar predicciones para cada imagen en la carpeta
+for file in image_files:
+    img_path = os.path.join(predict_dir, file)
 
-# Función para cargar y preprocesar imágenes de la carpeta "valid"
-def load_images_for_prediction(folder, image_size):
-    images = []
+    # Cargar la imagen y preprocesarla para realizar la predicción
+    img = cv2.imread(img_path)
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)  # Convertir a escala de grises
+    img = cv2.resize(img, (128, 128))  # Ajustar tamaño a 128x128
+    img = np.expand_dims(img, axis=0)
+    img = img / 255.  # Normalizar la imagen
 
-    for filename in os.listdir(folder):
-        image_path = os.path.join(folder, filename)
-        image = cv2.imread(image_path)
-        # Aplicar el preprocesamiento a cada imagen
-        image = preprocess_image(image, image_size)
-        image = np.expand_dims(image, axis=-1)  # Agregar dimensión del canal
-        images.append(image)
+    # Realizar la predicción
+    prediction = model.predict(img)
+    if prediction < 0.5:
+        print(f"La imagen {file} es 'normal'. ({prediction})")
+        i=i+1
+    else:
+        print(f"La imagen {file} tiene 'fractura de muñeca'.({prediction})")
+        z=z+1
 
-    return np.array(images)
-
-# Realizar la carga y preprocesamiento de las imágenes de validación
-images_valid_predict = load_images_for_prediction(valid_folder, image_size)
-
-# Realizar predicciones
-predictions = model.predict(images_valid_predict)
-
-# Las predicciones contendrán los valores de probabilidad para cada clase
-# Puedes convertir las probabilidades en clases (0 o 1) usando un umbral, por ejemplo 0.5
-threshold = 0.5
-predicted_classes = (predictions > threshold).astype(int)
-
-# Imprimir las predicciones
-print("Predicciones:")
-print(predicted_classes)
+print(f"Total de rx normal: ({i})")
+print(f"Total de rx fractura: ({z})")
