@@ -13,7 +13,7 @@ from Load_Images import preprocess_image
 from sklearn.model_selection import train_test_split
 from keras.layers import Flatten, Dense, Dropout
 from keras import regularizers
-
+from tensorflow.keras.applications import InceptionV3
 
 # Tamaño de las imágenes
 image_size = (256, 256)
@@ -34,9 +34,23 @@ def load_images_from_folder(folder, image_size, label):
         labels.append(label) 
     return np.array(images), np.array(labels)
 
+inception = InceptionV3(
+    input_shape=(
+        256, # Tamaño de la imagen
+        256, # Tamaño de la imagen
+        3, # 3 canales, en modelos preentrenados es obligatorio RGB
+    ),
+    include_top=False,  # No incluir capas completamente conectadas
+    weights="imagenet",  # Cargar pesos preentrenados
+)
 
-images_0, labels_0 = load_images_from_folder("DATASET 3ER MODELO\\Dataset equilibrado REFINADO\\0", image_size, 0)
-images_1, labels_1 = load_images_from_folder("DATASET 3ER MODELO\\Dataset equilibrado REFINADO\\1", image_size, 1)
+# Evitar el entrenamiento en estas capas a futuro
+inception.trainable = False
+
+
+
+images_0, labels_0 = load_images_from_folder("./DATASET 3ER MODELO/Dataset equilibrado REFINADO/0", image_size, 0)
+images_1, labels_1 = load_images_from_folder("./DATASET 3ER MODELO/Dataset equilibrado REFINADO/1", image_size, 1)
 
 # Combinar imágenes y etiquetas
 images = np.concatenate((images_0, images_1))
@@ -47,13 +61,7 @@ images_train, images_valid, labels_train, labels_valid = train_test_split(images
 
 #Modelo
 model = Sequential([
-    Conv2D(128, (3, 3), activation='relu', input_shape=(128, 128, 1)),
-    MaxPooling2D((2, 2)),
-    Conv2D(256, (3, 3), activation='relu'),
-    MaxPooling2D((2, 2)),
-    Conv2D(512, (3, 3), activation='relu'),
-    MaxPooling2D((2, 2)),
-
+    inception,  # Capas de InceptionV3
     Flatten(),
     Dense(512, activation='relu'),
     Dense(256, activation='relu'),

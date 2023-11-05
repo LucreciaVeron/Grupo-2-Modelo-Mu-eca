@@ -59,7 +59,8 @@ train/
 models/
 __pycache__/
 src/
-
+DATASET 3ER MODELO/
+.ipynb_checkpoints/
 
 #Archivos
 archive.zip
